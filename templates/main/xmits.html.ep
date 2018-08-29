@@ -1,0 +1,36 @@
+% layout 'default';
+% title 'Some Transmissions';
+<h2>Some Transmissions</h2>
+<!-- <body><%= dumper $xmits %></body> -->
+<p>
+  <audio id="player" controls>
+    Your browser does not support the audio element.
+  </audio>
+</p>
+<table border="1">
+  <tr>
+    <th>File</th>
+    <th>Detect</th>
+    <th>Pos</th>
+    <th>Rounded</th>
+    <th>Time</th>
+  </tr>
+  % foreach my $row (@$xmits) {
+  <tr>
+    <td><%= $row->{file} %></td>
+    <td><%= $row->{freq_detect} %></td>
+    <td><%= $row->{pos} %></td>
+    <td><%= $row->{freq_rounded} %></td>
+    <td><%= $row->{time} %></td>
+    <td><input type="button" value="play" id="<%= $row->{file} %>" onclick=play("<%= $row->{file} %>")></td> 
+  </tr>
+  % }
+</table>
+
+<script>
+  function play (file) {
+    console.log(file)
+    player.src = '/play?file=' + file;
+    player.play();
+  }
+</script>
