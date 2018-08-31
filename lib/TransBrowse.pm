@@ -28,6 +28,7 @@ sub startup {
   # Normal route to controller
   $r->get('/')->to('main#xmits');
   $r->get('/play')->to('main#play');
+  $r->get('/items')->to('main#items');
 }
 
 1;

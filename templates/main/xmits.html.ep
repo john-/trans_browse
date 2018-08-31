@@ -4,7 +4,6 @@
 %= javascript '//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js'
 %= stylesheet '//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css'
 <h2>Some Transmissions</h2>
-<!-- <body><%= dumper $xmits %></body> -->
 <p>
   <audio id="player" controls>
     Your browser does not support the audio element.
@@ -18,25 +17,28 @@
       <th>Pos</th>
       <th>Rounded</th>
       <th>Time</th>
+      <th>Action</th>
     </tr>
   </thead>
-  <tbody>
-    % foreach my $row (@$xmits) {
-    <tr>
-      <td><%= $row->{file} %></td>
-      <td><%= $row->{freq_detect} %></td>
-      <td><%= $row->{pos} %></td>
-      <td><%= $row->{freq_rounded} %></td>
-      <td><%= $row->{time} %></td>
-<!--      <td><input type="button" value="play" id="<%= $row->{file} %>" onclick=play("<%= $row->{file} %>")></td>  -->
-    </tr>
-    % }
-  </tbody>
 </table>
 
 <script>
   $(document).ready( function () {
-    $('#xmit_table').DataTable();
+    $('#xmit_table').DataTable( {
+        "ajax": "/items",
+        "columns": [
+            { "data": "file" },
+            { "data": "freq_detect" },
+            { "data": "pos" },
+            { "data": "freq_rounded" },
+            { "data": "time" }
+        ],
+        "columnDefs": [ {
+            "targets": -1,
+            "data": null,
+            "defaultContent": "<button>Click!</button>"
+          } ]
+    } );
   } );
 
   function play (file) {
