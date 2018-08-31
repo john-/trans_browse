@@ -1,8 +1,8 @@
 % layout 'default';
 % title 'Some Transmissions';
-%= javascript 'https://code.jquery.com/jquery-3.3.1.js'
-%= javascript '//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js'
-%= stylesheet '//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css'
+%= javascript '/jquery-3.3.1.js'
+%= javascript '/jquery.dataTables.min.js'
+%= stylesheet '/jquery.dataTables.min.css'
 <h2>Some Transmissions</h2>
 <p>
   <audio id="player" controls>
@@ -24,26 +24,31 @@
 
 <script>
   $(document).ready( function () {
-    $('#xmit_table').DataTable( {
-        "ajax": "/items",
-        "columns": [
-            { "data": "file" },
-            { "data": "freq_detect" },
-            { "data": "pos" },
-            { "data": "freq_rounded" },
-            { "data": "time" }
-        ],
-        "columnDefs": [ {
-            "targets": -1,
-            "data": null,
-            "defaultContent": "<button>Click!</button>"
-          } ]
-    } );
+    var table = $('#xmit_table').DataTable( {
+        ajax: "/items",
+        columns: [
+            { data: "file" },
+            { data: "freq_detect" },
+            { data: "pos" },
+            { data: "freq_rounded" },
+            { data: "time" },
+            {
+                data: null,
+                className: "center",
+                defaultContent: '<a href="" class="play_bttn">Play</a> / <a href="" class="editor_remove">Delete</a>'
+            }
+        ]
+   } );
+
+  // Play xmit
+  $('#xmit_table').on('click', 'a.play_bttn', function (e) {
+      e.preventDefault();
+
+      var data = table.row($(this).closest('tr')).data();
+      player.src = '/play?file=' + data[Object.keys(data)[1]];
+      player.play();
   } );
 
-  function play (file) {
-    console.log(file)
-    player.src = '/play?file=' + file;
-    player.play();
-  }
+  } );
+
 </script>

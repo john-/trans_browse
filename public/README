@@ -1,0 +1,5 @@
+# download dependencies
+
+wget https://code.jquery.com/jquery-3.3.1.js
+wget cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js
+wget cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css
