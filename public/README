@@ -3,3 +3,12 @@
 wget https://code.jquery.com/jquery-3.3.1.js
 wget cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js
 wget cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css
+
+# download images for datatables sort icons to /public/images from here:
+# https://github.com/DataTables/DataTables/tree/master/media/images
+
+# modify jquery.dataTables.min.css to load images from /images
+# for example
+# background-image: url("/images/sort_both.png");
+# downlad with firefox or even wget seems flakey as it corrupts images
+# I need to do a right click and "save pictures as" !
