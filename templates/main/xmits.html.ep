@@ -1,8 +1,8 @@
 % layout 'default';
 % title 'Some Transmissions';
 %= javascript '/jquery-3.3.1.js'
-%= javascript '/jquery.dataTables.min.js'
-%= stylesheet '/jquery.dataTables.min.css'
+%= javascript '/jquery.dataTables.js'
+%= stylesheet '/jquery.dataTables.css'
 <h2>Some Transmissions</h2>
 <p>
   <audio id="player" controls>
@@ -17,6 +17,8 @@
       <th>Pos</th>
       <th>Rounded</th>
       <th>Time</th>
+      <th>Detect Voice</th>
+      <th>Is Voice</th>
       <th>Action</th>
     </tr>
   </thead>
@@ -26,12 +28,15 @@
   $(document).ready( function () {
     var table = $('#xmit_table').DataTable( {
         ajax: "/items",
+        order: [[ 4, "asc" ]],
         columns: [
             { data: "file" },
             { data: "freq_detect" },
             { data: "pos" },
             { data: "freq_rounded" },
             { data: "time" },
+            { data: "detect_voice" },
+            { data: "is_voice" },
             {
                 data: null,
                 className: "center",
@@ -45,7 +50,7 @@
       e.preventDefault();
 
       var data = table.row($(this).closest('tr')).data();
-      player.src = '/play?file=' + data[Object.keys(data)[1]];
+      player.src = '/play?file=' + data[Object.keys(data)[2]];
       player.play();
   } );
 

@@ -18,7 +18,7 @@ sub get_xmits {
     my $trans = $self
 	->postgres
 	->db
-	->query('select file, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered from xmit_history where entered >= timestamp \'2018-08-05 14:00\' and entered <= \'2018-08-05 16:00\' order by timestamp asc limit 100')
+	->query('select file, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, is_voice from xmit_history where entered >= timestamp \'2018-08-05 14:00\' and entered <= timestamp \'2018-08-05 16:00\' order by timestamp asc limit 1000')
 #	->query('select file from xmit_history limit 10 order by entered asc')
 	->hashes;
 
