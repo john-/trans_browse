@@ -50,13 +50,12 @@ sub set_voice {
     my ($self, $xmit_key, $is_voice) = @_;
 
     eval {
-        my $resp = $self
+        $self
 	    ->postgres
 	    ->db
             ->update('xmit_history', {is_voice => $is_voice}, {xmit_key => $xmit_key});
     };
     $self->log->error($@) if $@;
-    #print "database respone: $resp\n";
 };
 
 
