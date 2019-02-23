@@ -11,6 +11,7 @@ use Carp ();
 use Data::Dumper;
 
 has postgres => sub { Carp::croak 'db is required' };
+has log      => sub { Carp::croak 'log is required' };
 
 sub get_xmits {
     my $self = shift;
@@ -18,7 +19,7 @@ sub get_xmits {
     my $trans = $self
 	->postgres
 	->db
-	->query('select file, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, is_voice from xmit_history where entered >= timestamp \'2018-08-05 14:00\' and entered <= timestamp \'2018-08-05 16:00\' order by timestamp asc limit 1000')
+	->query('select xmit_key, file, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, is_voice from xmit_history where entered >= timestamp \'2018-08-05 14:00\' and entered <= timestamp \'2018-08-05 16:00\' order by timestamp asc limit 1000')
 #	->query('select file from xmit_history limit 10 order by entered asc')
 	->hashes;
 
@@ -43,6 +44,19 @@ sub get_full_name {
 	->name( $file )
 	->in( '/cart/data/wav' );
     return $files[0];
+};
+
+sub set_voice {
+    my ($self, $xmit_key, $is_voice) = @_;
+
+    eval {
+        my $resp = $self
+	    ->postgres
+	    ->db
+            ->update('xmit_history', {is_voice => $is_voice}, {xmit_key => $xmit_key});
+    };
+    $self->log->error($@) if $@;
+    #print "database respone: $resp\n";
 };
 
 

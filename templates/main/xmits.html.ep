@@ -26,34 +26,55 @@
 
 <script>
   $(document).ready( function () {
+    var audio_type = [{'Value': '', 'Text': 'Unknown'}, {'Value': '1', 'Text': 'Yes'}, {'Value': '0', 'Text': 'No'}];
     var table = $('#xmit_table').DataTable( {
-        ajax: "/items",
-        order: [[ 4, "asc" ]],
-        columns: [
-            { data: "file" },
-            { data: "freq_detect" },
-            { data: "pos" },
-            { data: "freq_rounded" },
-            { data: "time" },
-            { data: "detect_voice" },
-            { data: "is_voice" },
-            {
-                data: null,
-                className: "center",
-                defaultContent: '<a href="" class="play_bttn">Play</a> / <a href="" class="editor_remove">Delete</a>'
+      ajax: "/items",
+      order: [[ 4, "asc" ]],
+      columns: [
+        { data: "file" },
+        { data: "freq_detect" },
+        { data: "pos" },
+        { data: "freq_rounded" },
+        { data: "time" },
+        { data: "detect_voice" },
+        //{ data: "is_voice" },
+        {
+          data: "is_voice",
+          render: function(data, type, full, meta){
+          var $select = $('<select/>', { 'class': 'ctrl-status' });
+          $.each(audio_type, function (Value, Text) {
+            var $opt = $('<option/>', { 'value': Text.Value, 'text': Text.Text });
+            if (Text.Value === data){
+              $opt.attr("selected", "selected");
             }
-        ]
-   } );
+            $select.append($opt);
+          });
+          return $select.prop("outerHTML");
+        }
+        },
+        {
+          data: null,
+          className: "center",
+          defaultContent: '<a href="" class="play_bttn">Play</a> / <a href="" class="editor_remove">Delete</a>'
+        }
+      ]
+    } );
 
-  // Play xmit
-  $('#xmit_table').on('click', 'a.play_bttn', function (e) {
+    // Handle change event for audio type selection control
+    $('#xmit_table').on('change', '.ctrl-status', function(){
+      var data = $('#xmit_table').DataTable().row($(this).closest('tr')).data();
+      $.post( "setvoice", { xmit_key: data['xmit_key'],  is_voice: $(this).val() } );
+    });
+
+    // Play xmit
+    $('#xmit_table').on('click', 'a.play_bttn', function (e) {
       e.preventDefault();
 
       var data = table.row($(this).closest('tr')).data();
 
-      player.src = '/play?file=' + data[Object.keys(data)[2]];
+      player.src = '/play?file=' + data['file'];
       player.play();
-  } );
+    } );
 
   } );
 

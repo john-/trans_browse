@@ -17,6 +17,7 @@ sub startup {
       my $c = shift;
       return TransBrowse::Model::Transmissions->new(
 	  postgres => $c->app->postgres,
+	  log      => $c->app->log,
       );
   });
 
@@ -29,6 +30,7 @@ sub startup {
   $r->get('/')->to('main#xmits');
   $r->get('/play')->to('main#play');
   $r->get('/items')->to('main#items');
+  $r->post('/setvoice')->to('main#setvoice');
 }
 
 1;
