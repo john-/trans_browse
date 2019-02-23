@@ -1,0 +1,13 @@
+[Unit]
+    Description=Transmission browse and classify (trans_browse)
+    Requires=postgresql.service
+    After=postgresql.service
+
+[Service]
+    User=%i
+    ExecStart=/cart/trans_browse/script/trans_browse daemon --listen "http://*:3010"
+    RestartSec=30sec
+    Restart=on-failure
+
+[Install]
+    WantedBy=multi-user.target
