@@ -50,6 +50,7 @@
       e.preventDefault();
 
       var data = table.row($(this).closest('tr')).data();
+
       player.src = '/play?file=' + data[Object.keys(data)[2]];
       player.play();
   } );

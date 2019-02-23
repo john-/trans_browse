@@ -39,13 +39,10 @@ sub get_xmits {
 sub get_full_name {
     my ($self, $file) = @_;
 
-    # right now file needs to be in main wav file directory and not a subdir
-#    say "in get_full_name: $file";
-#    my @files = File::Find::Rule->file()
-#	->name( $file )
-#	->in( '/home/pub/ham2mon/apps/wav' );
-    #    say @files;
-    return '/home/pub/ham2mon/apps/wav/' . $file;
+    my @files = File::Find::Rule->file()
+	->name( $file )
+	->in( '/cart/data/wav' );
+    return $files[0];
 };
 
 

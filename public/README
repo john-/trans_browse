@@ -1,8 +1,8 @@
 # download dependencies
 
 wget https://code.jquery.com/jquery-3.3.1.js
-wget cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js
-wget cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css
+wget cdn.datatables.net/1.10.19/js/jquery.dataTables.js
+wget cdn.datatables.net/1.10.19/css/jquery.dataTables.css
 
 # download images for datatables sort icons to /public/images from here:
 # https://github.com/DataTables/DataTables/tree/master/media/images

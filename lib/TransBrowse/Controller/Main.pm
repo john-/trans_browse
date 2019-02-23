@@ -25,11 +25,9 @@ sub play {
     my $full_name = $self->model->get_full_name($file);
 
     $self->render_file(
-	#'filepath'            => "/home/pub/ham2mon/apps/wav/$file",
-	#'filepath'            => "/home/pub/ham2mon/apps/wav_trimmed/$file",
 	'filepath'            => $full_name,
 	'content_disposition' => 'inline'
-    );
+        );
 }
 
 1;
