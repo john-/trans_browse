@@ -34,7 +34,7 @@ sub setvoice {
     my $self = shift;
 
     my $response = $self->model->set_voice($self->param('xmit_key'),
-                                           $self->param('is_voice'));
+                                           $self->param('class'));
 
     $self->render( text => 'success', status => 200 );
 }

@@ -3,6 +3,7 @@
 wget https://code.jquery.com/jquery-3.3.1.js
 wget cdn.datatables.net/1.10.19/js/jquery.dataTables.js
 wget cdn.datatables.net/1.10.19/css/jquery.dataTables.css
+wget https://momentjs.com/downloads/moment.min.js
 
 # download images for datatables sort icons to /public/images from here:
 # https://github.com/DataTables/DataTables/tree/master/media/images

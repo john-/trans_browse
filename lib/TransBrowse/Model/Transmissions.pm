@@ -19,20 +19,20 @@ sub get_xmits {
     my $trans = $self
 	->postgres
 	->db
-	->query('select xmit_key, file, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, is_voice from xmit_history where entered >= timestamp \'2018-08-05 14:00\' and entered <= timestamp \'2018-08-05 16:00\' order by timestamp asc limit 1000')
+	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, class from xmit_history where entered >= timestamp \'2018-08-05 14:00\' and entered <= timestamp \'2018-08-05 16:00\' order by timestamp asc limit 1000')
 #	->query('select file from xmit_history limit 10 order by entered asc')
 	->hashes;
 
-    $trans->each( sub {
-        if ( $_->{file} =~ /^(\d+.\d+)_(\d+).wav/ ) {
-            my $pos =  ($1 - int($1)) / 0.0125 ;
-            $pos = nearest( 0.01, $pos );
-            $_->{freq_detect} = $1;
-            $_->{pos} = $pos;
-            $_->{freq_rounded} = int($1) + 0.0125 * sprintf('%.f', $pos);
-            $_->{time} = $2;
-        }
-    } );
+#    $trans->each( sub {
+#        if ( $_->{file} =~ /^(\d+.\d+)_(\d+).wav/ ) {
+#            my $pos =  ($1 - int($1)) / 0.0125 ;
+	    #            $pos = nearest( 0.01, $pos );
+#            $_->{freq_detect} = $1;
+#            $_->{pos} = $pos;
+#            $_->{freq_rounded} = int($1) + 0.0125 * sprintf('%.f', $pos);
+#            $_->{time} = $2;
+#        }
+#    } );
 
     return $trans;
 };
@@ -47,13 +47,13 @@ sub get_full_name {
 };
 
 sub set_voice {
-    my ($self, $xmit_key, $is_voice) = @_;
+    my ($self, $xmit_key, $class) = @_;
 
     eval {
         $self
 	    ->postgres
 	    ->db
-            ->update('xmit_history', {is_voice => $is_voice}, {xmit_key => $xmit_key});
+            ->update('xmit_history', {class => $class}, {xmit_key => $xmit_key});
     };
     $self->log->error($@) if $@;
 };

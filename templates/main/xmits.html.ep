@@ -3,6 +3,7 @@
 %= javascript '/jquery-3.3.1.js'
 %= javascript '/jquery.dataTables.js'
 %= stylesheet '/jquery.dataTables.css'
+%= javascript '/moment.min.js'
 <h2>Some Transmissions</h2>
 <p>
   <audio id="player" controls>
@@ -13,12 +14,10 @@
   <thead>
     <tr>
       <th>File</th>
-      <th>Detect</th>
-      <th>Pos</th>
-      <th>Rounded</th>
-      <th>Time</th>
+      <th>Freq</th>
+      <th>When</th>
       <th>Detect Voice</th>
-      <th>Is Voice</th>
+      <th>Class</th>
       <th>Action</th>
     </tr>
   </thead>
@@ -26,20 +25,21 @@
 
 <script>
   $(document).ready( function () {
-    var audio_type = [{'Value': '', 'Text': 'Unknown'}, {'Value': '1', 'Text': 'Yes'}, {'Value': '0', 'Text': 'No'}];
+    var audio_type = [{'Value': '', 'Text': 'TBD'}, {'Value': 'V', 'Text': 'Voice'}, {'Value': 'D', 'Text': 'Data'}, {'Value': 'S', 'Text': 'Skip'}];
     var table = $('#xmit_table').DataTable( {
       ajax: "/items",
       order: [[ 4, "asc" ]],
       columns: [
         { data: "file" },
-        { data: "freq_detect" },
-        { data: "pos" },
-        { data: "freq_rounded" },
-        { data: "time" },
+        { data: "freq" },
+        { data: "entered",
+          render: function ( data, type, row ) {
+              return (moment(data).format("YYYYMMDD h:mm:ss a"));
+          }
+        },
         { data: "detect_voice" },
-        //{ data: "is_voice" },
         {
-          data: "is_voice",
+          data: "class",
           render: function(data, type, full, meta){
           var $select = $('<select/>', { 'class': 'ctrl-status' });
           $.each(audio_type, function (Value, Text) {
@@ -63,7 +63,7 @@
     // Handle change event for audio type selection control
     $('#xmit_table').on('change', '.ctrl-status', function(){
       var data = $('#xmit_table').DataTable().row($(this).closest('tr')).data();
-      $.post( "setvoice", { xmit_key: data['xmit_key'],  is_voice: $(this).val() } );
+      $.post( "setvoice", { xmit_key: data['xmit_key'],  class: $(this).val() } );
     });
 
     // Play xmit
