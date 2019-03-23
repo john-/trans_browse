@@ -23,6 +23,7 @@
   </thead>
   <tfoot>
     <tr>
+      <th>File</th>
       <th>Freq</th>
       <th>When</th>
       <th>Detect Voice</th>
@@ -34,7 +35,7 @@
 
 <script>
   $(document).ready( function () {
-    var audio_type = [{'Value': '', 'Text': 'TBD'}, {'Value': 'V', 'Text': 'Voice'}, {'Value': 'D', 'Text': 'Data'}, {'Value': 'S', 'Text': 'Skip'}];
+    var class_lookup = { 'U':'TBD', 'V':'Voice', 'D':'Data', 'S':'Skip' };
     var table = $('#xmit_table').DataTable( {
       ajax: "/items",
       order: [[ 4, "asc" ]],
@@ -52,16 +53,15 @@
           render: function(data, type, full, meta){
             if (type !== 'filter') {
               var $select = $('<select/>', { 'class': 'ctrl-status' });
-              $.each(audio_type, function (Value, Text) {
-                var $opt = $('<option/>', { 'value': Text.Value, 'text': Text.Text });
-                if (Text.Value === data){
+              for (var raw in class_lookup) {
+                var $opt = $('<option/>', { 'value': raw, 'text': class_lookup[raw] });
+                if (raw === data){
                   $opt.attr("selected", "selected");
                 }
                 $select.append($opt);
-              });
+              }
               return $select.prop("outerHTML");
             } else {
-              if (data === null) { data = 'TBD' }
               return data;
             }
           }
@@ -89,9 +89,7 @@
             } );
 
             column.data().unique().sort().each( function ( d, j ) {
-            //column.cells('', column[0]).render('display').sort().unique().each( function ( d, j ) {
-              if ( d === null) { d = 'TBD' }
-              select.append( '<option value="'+d+'">'+d+'</option>' )
+              select.append( '<option value="'+d+'">'+class_lookup[d]+'</option>' )
             } );
         } );
       }
