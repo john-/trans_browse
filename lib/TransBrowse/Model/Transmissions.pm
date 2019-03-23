@@ -20,19 +20,7 @@ sub get_xmits {
 	->postgres
 	->db
 	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, class from xmit_history where entered >= timestamp \'2018-08-05 14:00\' and entered <= timestamp \'2018-08-05 16:00\' order by timestamp asc limit 1000')
-#	->query('select file from xmit_history limit 10 order by entered asc')
 	->hashes;
-
-#    $trans->each( sub {
-#        if ( $_->{file} =~ /^(\d+.\d+)_(\d+).wav/ ) {
-#            my $pos =  ($1 - int($1)) / 0.0125 ;
-	    #            $pos = nearest( 0.01, $pos );
-#            $_->{freq_detect} = $1;
-#            $_->{pos} = $pos;
-#            $_->{freq_rounded} = int($1) + 0.0125 * sprintf('%.f', $pos);
-#            $_->{time} = $2;
-#        }
-#    } );
 
     return $trans;
 };
