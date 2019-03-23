@@ -21,6 +21,15 @@
       <th>Action</th>
     </tr>
   </thead>
+  <tfoot>
+    <tr>
+      <th>Freq</th>
+      <th>When</th>
+      <th>Detect Voice</th>
+      <th>Class</th>
+      <th>Action</th>
+    </tr>
+  </tfoot>
 </table>
 
 <script>
@@ -41,23 +50,51 @@
         {
           data: "class",
           render: function(data, type, full, meta){
-          var $select = $('<select/>', { 'class': 'ctrl-status' });
-          $.each(audio_type, function (Value, Text) {
-            var $opt = $('<option/>', { 'value': Text.Value, 'text': Text.Text });
-            if (Text.Value === data){
-              $opt.attr("selected", "selected");
+            if (type !== 'filter') {
+              var $select = $('<select/>', { 'class': 'ctrl-status' });
+              $.each(audio_type, function (Value, Text) {
+                var $opt = $('<option/>', { 'value': Text.Value, 'text': Text.Text });
+                if (Text.Value === data){
+                  $opt.attr("selected", "selected");
+                }
+                $select.append($opt);
+              });
+              return $select.prop("outerHTML");
+            } else {
+              if (data === null) { data = 'TBD' }
+              return data;
             }
-            $select.append($opt);
-          });
-          return $select.prop("outerHTML");
-        }
+          }
         },
         {
           data: null,
           className: "center",
           defaultContent: '<a href="" class="play_bttn">Play</a> / <a href="" class="editor_remove">Delete</a>'
         }
-      ]
+      ],
+      initComplete: function () {
+          //this.api().columns().every( function () {
+          this.api().columns([3, 4]).every( function () {
+          var column = this;
+          var select = $('<select><option value=""></option></select>')
+            .appendTo( $(column.footer()).empty() )
+            .on( 'change', function () {
+              var val = $.fn.dataTable.util.escapeRegex(
+                $(this).val()
+              );
+
+              column
+                .search( val ? '^'+val+'$' : '', true, false )
+                .draw();
+            } );
+
+            column.data().unique().sort().each( function ( d, j ) {
+            //column.cells('', column[0]).render('display').sort().unique().each( function ( d, j ) {
+              if ( d === null) { d = 'TBD' }
+              select.append( '<option value="'+d+'">'+d+'</option>' )
+            } );
+        } );
+      }
     } );
 
     // Handle change event for audio type selection control
