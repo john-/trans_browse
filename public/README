@@ -8,7 +8,7 @@ wget https://momentjs.com/downloads/moment.min.js
 # download images for datatables sort icons to /public/images from here:
 # https://github.com/DataTables/DataTables/tree/master/media/images
 
-# modify jquery.dataTables.min.css to load images from /images
+# modify jquery.dataTables.css to load images from /images
 # for example
 # background-image: url("/images/sort_both.png");
 # downlad with firefox or even wget seems flakey as it corrupts images
