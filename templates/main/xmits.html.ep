@@ -9,6 +9,7 @@
   <audio id="player" controls>
     Your browser does not support the audio element.
   </audio>
+  <input type="button" value="Create training data" onclick="window.location.href='/create_training_data'" />
 </p>
 <table id="xmit_table" class="display">
   <thead>

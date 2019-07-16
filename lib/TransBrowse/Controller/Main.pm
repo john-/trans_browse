@@ -39,4 +39,12 @@ sub setvoice {
     $self->render( text => 'success', status => 200 );
 }
 
+sub create_training_data {
+    my $self = shift;
+
+    my $response = $self->model->create_training_data();
+
+    $self->render( text => $response, status => 200 );
+}
+
 1;
