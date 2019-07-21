@@ -22,7 +22,8 @@ sub get_xmits {
     my $trans = $self
 	->postgres
 	->db
-	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, class from xmit_history where entered >= timestamp \'2018-08-05 14:00\' and entered <= timestamp \'2018-08-05 16:00\' order by timestamp asc limit 1000')
+	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, class from xmit_history where entered >= timestamp \'2019-06-16 16:00\' and entered <= timestamp \'2019-06-16 18:00\' order by timestamp asc limit 1000')    # Sprints 2019
+#	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, class from xmit_history where entered >= timestamp \'2018-08-05 14:00\' and entered <= timestamp \'2018-08-05 16:00\' order by timestamp asc limit 1000')     # IMSA 2018
 	->hashes;
 
     return $trans;
@@ -57,7 +58,7 @@ sub create_training_data {
     my $trans = $self
 	->postgres
 	->db
-	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, class from xmit_history where class <> \'U\'  order by timestamp asc limit 1000')
+	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, class from xmit_history where class <> \'U\'')
 	->hashes;
 
     my $base_dir = $self->config->{base_dir};
@@ -119,9 +120,6 @@ sub create_training_data {
 	} else {
 	    $self->log->error("system @args failed: $?");
 	}
-
-	#$self->log->debug('class: ' . $_->{class});
-
     });
     $self->log->info(sprintf('created %d of %d training files', $created, $trans->size));
     return 'Training data created';
