@@ -113,8 +113,18 @@ sub create_training_data {
         my $duration = $read->length_seconds;
 
         # use only middle second for first attempt at training
-        $self->log->debug(sprintf('attempting to process: %s', $src));
+        $self->log->debug(sprintf('attempting to create 1 sec extract: %s', $src));
 	my @args = ( '/usr/bin/sox', $src, $dst, 'trim', $duration / 2 - 0.5, '1' );
+	if (system( @args )  == 0) {
+	    #$created++;
+	} else {
+	    $self->log->error("system @args failed: $?");
+	}
+        $self->log->debug(sprintf('attempting to create spectrogram: %s', $dst));
+	my $dst_spect = "$dst.png";
+	# ffmpeg -i 464.525_1560719085.wav -lavfi showspectrumpic=s=960x540:scale=log  464.525_1560719085.png
+	# size needs to be adjusted
+	my @args = ( '/usr/bin/ffmpeg', '-i', $dst, '-lavfi', 'showspectrumpic=s=960x540:scale=log:legend=off', $dst_spect );
 	if (system( @args )  == 0) {
 	    $created++;
 	} else {
