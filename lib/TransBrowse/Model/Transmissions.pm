@@ -123,8 +123,8 @@ sub create_training_data {
         $self->log->debug(sprintf('attempting to create spectrogram: %s', $dst));
 	my $dst_spect = "$dst.png";
 	# ffmpeg -i 464.525_1560719085.wav -lavfi showspectrumpic=s=960x540:scale=log  464.525_1560719085.png
-	# size needs to be adjusted
-	my @args = ( '/usr/bin/ffmpeg', '-i', $dst, '-lavfi', 'showspectrumpic=s=960x540:scale=log:legend=off', $dst_spect );
+	# size needs to be adjusted.   40x20 is arbitrary.
+	my @args = ( '/usr/bin/ffmpeg', '-i', $dst, '-lavfi', 'showspectrumpic=s=40x20:scale=log:legend=off', $dst_spect );
 	if (system( @args )  == 0) {
 	    $created++;
 	} else {
