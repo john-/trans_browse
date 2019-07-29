@@ -9,6 +9,8 @@ use Math::Round;
 
 use Audio::Wav;
 
+use File::Path 'make_path';
+
 use Carp ();
 use Data::Dumper;
 
@@ -74,40 +76,46 @@ sub create_training_data {
     }
 
     # create directory structure for training data
-    if (!mkdir($base_dir)) {
-	$err = sprintf('Could not create base dir (%s) for training data: %s (no training data has been created)', $base_dir, $!);
-        $self->log->error(sprintf($err));
-	return $err;
-    }
+    #if (-e $base_dir) {
+	#$err = sprintf('Could not create base dir (%s) for training data: %s (no training data has been created)', $base_dir, $!);
+       # $self->log->error(sprintf($err));
+#	return $err;
+ #   }
     my $classes = $trans->uniq( sub { $_->{class} } );
 
-    $classes->each( sub {
-	if (!defined($self->config->{dir_map}{$_->{class}})) {
-	    $err = sprintf('Config has no dir_map entry for "%s"', $_->{class});
-            $self->log->error(sprintf($err));
-	    return;
-	}
+    foreach my $phase ('train', 'test') {
+	$classes->each( sub {
 
-	my $dir = sprintf('%s/%s', $base_dir, $self->config->{dir_map}{$_->{class}});
-        if (!mkdir($dir)) {
-	    $err = sprintf('Could not create class dir (%s) for training data: %s', $dir, $!);
-            $self->log->error(sprintf($err));
-	} else {
-	    $self->log->info(sprintf('Created class dir for "%s": %s', $_->{class}, $dir));
-	}
-    });
+	    if (!defined($self->config->{dir_map}{$_->{class}})) {
+		$err = sprintf('Config has no dir_map entry for "%s"', $_->{class});
+		$self->log->error(sprintf($err));
+		return;
+	    }
 
-    if ($err) {
-	$self->log->error('No training data has been created');
-	return $err;
+	    my $dir = sprintf('%s/%s/%s', $base_dir, $phase, $self->config->{dir_map}{$_->{class}});
+	    if (make_path($dir)) {
+		$self->log->info(
+                   sprintf('Created class dir for phase %s "%s": %s', $phase, $_->{class}, $dir));
+	    } else {
+	        $err = sprintf(
+                  'Could not create dir (%s) for training data.  No training data created', $dir);
+	        $self->log->error($err);
+	        return $err;
+	    }
+	});
     }
 
     my $wav = Audio::Wav->new;
+    my $train_amount = int($trans->size * 0.8 );
+    my $phase = 'train'; # start out creating training data thn switch to test
 
     my $created = 0;
-    $trans->each( sub {
+    $trans->shuffle->each( sub {
+	if ($created > $train_amount) { $phase = 'test' }
+
 	my $src = $self->get_full_name($_->{file});
-        my $dst = sprintf('%s/%s/%s', $base_dir, $self->config->{dir_map}{$_->{class}}, $_->{file});
+        my $dst = sprintf('%s/%s/%s/%s', $base_dir, $phase, 
+            $self->config->{dir_map}{$_->{class}}, $_->{file});
 
         my $read = $wav->read( $src );
         my $duration = $read->length_seconds;
@@ -124,7 +132,7 @@ sub create_training_data {
 	my $dst_spect = "$dst.png";
 	# ffmpeg -i 464.525_1560719085.wav -lavfi showspectrumpic=s=960x540:scale=log  464.525_1560719085.png
 	# size needs to be adjusted.   40x20 is arbitrary.
-	my @args = ( '/usr/bin/ffmpeg', '-i', $dst, '-lavfi', 'showspectrumpic=s=40x20:scale=log:legend=off', $dst_spect );
+	@args = ( '/usr/bin/ffmpeg', '-i', $dst, '-lavfi', 'showspectrumpic=s=100x50:scale=log:legend=off', $dst_spect );
 	if (system( @args )  == 0) {
 	    $created++;
 	} else {
