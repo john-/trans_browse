@@ -7,7 +7,7 @@ use strict;
 use File::Find::Rule;
 use Math::Round;
 
-use Audio::Wav;
+use TransmissionIdentifierBase;
 
 use File::Path 'make_path';
 
@@ -55,7 +55,7 @@ sub set_voice {
 sub create_training_data {
     my $self = shift;
 
-    $self->log->debug('Creating training data');
+    $self->log->info('Creating training data');
 
     my $trans = $self
 	->postgres
@@ -105,7 +105,7 @@ sub create_training_data {
 	});
     }
 
-    my $wav = Audio::Wav->new;
+    my $wav_to_png = TransmissionIdentifierBase->new;
     my $train_amount = int($trans->size * 0.8 );
     my $phase = 'train'; # start out creating training data thn switch to test
 
@@ -114,29 +114,14 @@ sub create_training_data {
 	if ($created > $train_amount) { $phase = 'test' }
 
 	my $src = $self->get_full_name($_->{file});
-        my $dst = sprintf('%s/%s/%s/%s', $base_dir, $phase, 
+        my $dst = sprintf('%s/%s/%s/%s.png', $base_dir, $phase, 
             $self->config->{dir_map}{$_->{class}}, $_->{file});
 
-        my $read = $wav->read( $src );
-        my $duration = $read->length_seconds;
+        my $file = $wav_to_png->audio_to_spectrogram( input => $src , output => $dst );
 
-        # use only middle second for first attempt at training
-        $self->log->debug(sprintf('attempting to create 1 sec extract: %s', $src));
-	my @args = ( '/usr/bin/sox', $src, $dst, 'trim', $duration / 2 - 0.5, '1' );
-	if (system( @args )  == 0) {
-	    #$created++;
-	} else {
-	    $self->log->error("system @args failed: $?");
-	}
-        $self->log->debug(sprintf('attempting to create spectrogram: %s', $dst));
-	my $dst_spect = "$dst.png";
-	# ffmpeg -i 464.525_1560719085.wav -lavfi showspectrumpic=s=960x540:scale=log  464.525_1560719085.png
-	# size needs to be adjusted.   40x20 is arbitrary.
-	@args = ( '/usr/bin/ffmpeg', '-i', $dst, '-lavfi', 'showspectrumpic=s=100x50:scale=log:legend=off', $dst_spect );
-	if (system( @args )  == 0) {
-	    $created++;
-	} else {
-	    $self->log->error("system @args failed: $?");
+	if ($file) {
+            $created++;
+            $self->log->debug(sprintf('created: %s', $file));
 	}
     });
     $self->log->info(sprintf('created %d of %d training files', $created, $trans->size));
