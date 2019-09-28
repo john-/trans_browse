@@ -24,7 +24,8 @@ sub get_xmits {
     my $trans = $self
 	->postgres
 	->db
-	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, class from xmit_history where entered >= timestamp \'2019-06-16 16:00\' and entered <= timestamp \'2019-06-16 18:00\' order by timestamp asc limit 1000')    # Sprints 2019
+	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, class from xmit_history where entered >= timestamp \'2019-08-04 13:30\' and entered <= timestamp \'2019-08-04 16:30\' order by timestamp asc limit 1000')    # IMSA 2019
+#	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, class from xmit_history where entered >= timestamp \'2019-06-16 16:00\' and entered <= timestamp \'2019-06-16 18:00\' order by timestamp asc limit 1000')    # Sprints 2019
 #	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, class from xmit_history where entered >= timestamp \'2018-08-05 14:00\' and entered <= timestamp \'2018-08-05 16:00\' order by timestamp asc limit 1000')     # IMSA 2018
 	->hashes;
 
