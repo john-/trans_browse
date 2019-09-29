@@ -120,7 +120,7 @@
         $.ajax({
           url: '/create_training_data',
           success: function(result){
-              $("#status").text(result);
+            $("textarea#status").val(result);
        }});
       });
     });
