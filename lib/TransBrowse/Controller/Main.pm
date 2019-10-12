@@ -47,4 +47,19 @@ sub create_training_data {
     $self->render( text => $response, status => 200 );
 }
 
+sub classify_file {
+    my $self = shift;
+    my $file = $self->param('file');
+
+    my %hash = %{$self->model->classify($file)};
+
+    my @response;
+    my @keys = sort { $hash{$b} <=> $hash{$a} } keys %hash;
+    foreach my $key ( @keys ) {
+	push @response, sprintf('%-6s %6f', $key, $hash{$key});
+    }
+
+    $self->render( text => join("\n", @response), status => 200 );
+}
+
 1;

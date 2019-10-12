@@ -7,7 +7,7 @@ use strict;
 use File::Find::Rule;
 use Math::Round;
 
-use TransmissionIdentifierBase;
+use TransmissionIdentifier;
 
 use File::Path 'make_path';
 
@@ -17,6 +17,10 @@ use Data::Dumper;
 has postgres => sub { Carp::croak 'db is required' };
 has log      => sub { Carp::croak 'log is required' };
 has config   => sub { Carp::croak 'config is required' };
+has trans_ident => sub { TransmissionIdentifier->new( { load_params => 1,
+                                                        params => '/cart/xmit_mxnet/xmit.params',
+                                                        labels => '/cart/xmit_mxnet/labels.txt' }
+                                                     ) };
 
 sub get_xmits {
     my $self = shift;
@@ -106,7 +110,7 @@ sub create_training_data {
 	});
     }
 
-    my $wav_to_png = TransmissionIdentifierBase->new;
+    #my $wav_to_png = TransmissionIdentifier->new;
     my $train_amount = int($trans->size * 0.8 );
     my $phase = 'train'; # start out creating training data thn switch to test
 
@@ -118,7 +122,7 @@ sub create_training_data {
         my $dst = sprintf('%s/%s/%s/%s.png', $base_dir, $phase, 
             $self->config->{dir_map}{$_->{class}}, $_->{file});
 
-        my $file = $wav_to_png->audio_to_spectrogram( input => $src , output => $dst );
+        my $file = $self->trans_ident->audio_to_spectrogram( input => $src , output => $dst );
 
 	if ($file) {
             $created++;
@@ -127,6 +131,16 @@ sub create_training_data {
     });
     $self->log->info(sprintf('created %d of %d training files', $created, $trans->size));
     return 'Training data created';
+}
+
+sub classify {
+    my ($self, $file) = @_;
+
+    my $input = $self->get_full_name($file);
+    my $class;
+    $class = $self->trans_ident->classify( input => $input );
+    #$self->log->error(sprintf($err));
+    return $class;
 }
 
 1;

@@ -71,7 +71,7 @@
         {
           data: null,
           className: "center",
-          defaultContent: '<a href="" class="play_bttn">Play</a> / <a href="" class="editor_remove">Delete</a>'
+          defaultContent: '<a href="" class="play_bttn">Play</a> / <a href="" class="classify_bttn">Classify</a>'
         }
       ],
       initComplete: function () {
@@ -113,6 +113,22 @@
       //$("#status").text('Playing: ' + data['file']);
       player.src = '/play?file=' + data['file'];
       player.play();
+    } );
+
+    $('#xmit_table').on('click', 'a.classify_bttn', function (e) {
+      e.preventDefault();
+
+      var data = table.row($(this).closest('tr')).data();
+
+      $.ajax({
+        url: '/classify_file?file=' + data['file'],
+        success: function(result){
+          $("textarea#status").val(result);
+      }});
+
+      //$("#status").text('Playing: ' + data['file']);
+      //player.src = '/play?file=' + data['file'];
+      //player.play();
     } );
 
     $(function () {

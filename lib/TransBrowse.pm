@@ -41,6 +41,7 @@ sub startup {
   $r->get('/items')->to('main#items');
   $r->post('/setvoice')->to('main#setvoice');
   $r->get('/create_training_data')->to('main#create_training_data');
+  $r->get('/classify_file')->to('main#classify_file');
 }
 
 1;
