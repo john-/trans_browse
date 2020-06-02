@@ -11,6 +11,8 @@ use TransmissionIdentifier;
 
 use File::Path 'make_path';
 
+use DateTime;
+
 use Carp ();
 use Data::Dumper;
 
@@ -30,7 +32,7 @@ sub get_xmits {
 	->db
 	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, class from xmit_history where entered >= cast(? as timestamp) and entered <= cast(? as timestamp) and class = any(?::text[]) and detect_voice = any(?::boolean[]) order by timestamp asc limit 1000',
             $self->config->{query}{begin},
-	    $self->config->{query}{end},
+            $self->config->{query}{end} || DateTime->now,
             $self->config->{query}{classes},
             $self->config->{query}{detect_voice},
         )    # IMSA 2019
