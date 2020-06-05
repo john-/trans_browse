@@ -94,7 +94,12 @@
               select.append( '<option value="'+d+'">'+d+'</option>' )
               //select.append( '<option value="'+d+'">'+class_lookup[d]+'</option>' )
             } );
-        } );
+          } );
+          // loops through every row not just ones in current page
+          //this.api().rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+          //  var data = this.data();
+          //  console.log(data);
+          //} );
       }
     } );
 
