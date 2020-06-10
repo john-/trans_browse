@@ -10,7 +10,7 @@
     Your browser does not support the audio element.
   </audio>
   <input type="button" value="Create training data" id="train_button"/>
-  <textarea rows="2" cols="70" id="status">Status text</textarea>
+  <textarea rows="3" cols="70" style="font-size: 12pt" id="status">Status text</textarea>
 </p>
 <table id="xmit_table" class="display">
   <thead>
@@ -109,6 +109,14 @@
       $.post( "setvoice", { xmit_key: data['xmit_key'],  class: $(this).val() } );
     });
 
+    function classify(file) {
+      $.ajax({
+        url: '/classify_file?file=' + file,
+        success: function(result){
+          $("textarea#status").val(result);
+      }});
+    }
+
     // Play xmit
     $('#xmit_table').on('click', 'a.play_bttn', function (e) {
       e.preventDefault();
@@ -118,6 +126,9 @@
       //$("#status").text('Playing: ' + data['file']);
       player.src = '/play?file=' + data['file'];
       player.play();
+
+      classify(data['file']);
+
     } );
 
     $('#xmit_table').on('click', 'a.classify_bttn', function (e) {
@@ -125,11 +136,7 @@
 
       var data = table.row($(this).closest('tr')).data();
 
-      $.ajax({
-        url: '/classify_file?file=' + data['file'],
-        success: function(result){
-          $("textarea#status").val(result);
-      }});
+      classify(data['file']);
 
       //$("#status").text('Playing: ' + data['file']);
       //player.src = '/play?file=' + data['file'];
