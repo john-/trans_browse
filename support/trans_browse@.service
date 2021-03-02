@@ -4,10 +4,15 @@
     After=postgresql.service
 
 [Service]
+    # for mxnet
+    Environment="LD_LIBRARY_PATH=/cart/incubator-mxnet/lib"
+    Environment="PERL5LIB=/cart/perl5/lib/perl5"
+
     User=%i
     ExecStart=/cart/trans_browse/script/trans_browse daemon --listen "http://*:3010"
     RestartSec=30sec
     Restart=on-failure
+
 
 [Install]
     WantedBy=multi-user.target
