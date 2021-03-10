@@ -96,48 +96,43 @@ sub create_training_data {
  #   }
     my $classes = $trans->uniq( sub { $_->{class} } );
 
-    foreach my $phase ('train', 'test') {
-	$classes->each( sub {
-
-	    if (!defined($self->config->{dir_map}{$_->{class}})) {
-		$err = sprintf('Config has no dir_map entry for "%s"', $_->{class});
-		$self->log->error(sprintf($err));
-		return;
-	    }
-
-	    my $dir = sprintf('%s/%s/%s', $base_dir, $phase, $self->config->{dir_map}{$_->{class}});
+    foreach my $rec (@{$classes}) {
+	my $class = $rec->{class};
+        if (!defined($self->config->{dir_map}{$class})) {
+            $err = sprintf('Config has no dir_map entry for "%s"', $class);
+	    $self->log->error(sprintf($err));
+	    return;
+        } else {
+	    my $dir = sprintf('%s/%s', $base_dir, $self->config->{dir_map}{$class});
 	    if (make_path($dir)) {
 		$self->log->info(
-                   sprintf('Created class dir for phase %s "%s": %s', $phase, $_->{class}, $dir));
+                   sprintf('Created class dir for "%s": %s', $class, $dir));
 	    } else {
 	        $err = sprintf(
                   'Could not create dir (%s) for training data.  No training data created', $dir);
 	        $self->log->error($err);
 	        return $err;
 	    }
-	});
+
+	}
     }
 
-    #my $wav_to_png = TransmissionIdentifier->new;
-    my $train_amount = int($trans->size * 0.8 );
-    my $phase = 'train'; # start out creating training data thn switch to test
-
     my $created = 0;
-    $trans->shuffle->each( sub {
-	if ($created > $train_amount) { $phase = 'test' }
-
+    $trans->each( sub {
 	my $src = $self->get_full_name($_->{file});
-        my $dst = sprintf('%s/%s/%s/%s.png', $base_dir, $phase, 
+        my $dst = sprintf('%s/%s/%s', $base_dir,
             $self->config->{dir_map}{$_->{class}}, $_->{file});
 
-        my $file = $self->trans_ident->audio_to_spectrogram( input => $src , output => $dst );
+        my $file = $self->trans_ident->audio_for_training( input => $src , output => $dst );
 
 	if ($file) {
             $created++;
             $self->log->debug(sprintf('created: %s', $file));
 	}
+
     });
     $self->log->info(sprintf('created %d of %d training files', $created, $trans->size));
+
     return 'Training data created';
 }
 
