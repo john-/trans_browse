@@ -30,7 +30,7 @@ sub get_xmits {
     my $trans = $self
 	->postgres
 	->db
-	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, class from xmit_history where entered >= cast(? as timestamp) and entered <= cast(? as timestamp) and class = any(?::text[]) and detect_voice = any(?::boolean[]) order by timestamp asc limit 1000',
+	->query('select xmit_key, file, (regexp_matches(file, \'^[0-9.]+\'))[1]::numeric as freq, (regexp_matches(file, \'_([0-9.]+)\'))[1]::numeric as timestamp, entered, detect_voice, class from xmit_history where entered >= cast(? as timestamp) and entered <= cast(? as timestamp) and class = any(?::text[]) and detect_voice = any(?::boolean[]) order by timestamp asc',
             $self->config->{query}{begin},
             $self->config->{query}{end} || DateTime->now,
             $self->config->{query}{classes},
