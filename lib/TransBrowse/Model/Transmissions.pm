@@ -4,6 +4,8 @@ use Mojo::Base -base;
 use warnings;
 use strict;
 
+use Mojo::JSON qw(decode_json);
+
 use File::Find::Rule;
 use Math::Round;
 
@@ -19,10 +21,11 @@ use Data::Dumper;
 has postgres => sub { Carp::croak 'db is required' };
 has log      => sub { Carp::croak 'log is required' };
 has config   => sub { Carp::croak 'config is required' };
-has trans_ident => sub { TransmissionIdentifier->new( { load_params => 1,
-                                                        params => '/cart/xmit_mxnet/xmit.params',
-                                                        labels => '/cart/xmit_mxnet/labels.txt' }
-                                                     ) };
+has ua       => sub { my $ua  = Mojo::UserAgent->new };
+#has trans_ident => sub { TransmissionIdentifier->new( { load_params => 1,
+#                                                        params => '/cart/xmit_mxnet/xmit.params',
+#                                                        labels => '/cart/xmit_mxnet/labels.txt' }
+#                                                     ) };
 
 sub get_xmits {
     my $self = shift;
@@ -139,10 +142,14 @@ sub create_training_data {
 sub classify {
     my ($self, $file) = @_;
 
-    my $input = $self->get_full_name($file);
-    my $class;
-    $class = $self->trans_ident->classify( input => $input );
+    my $res = $self->ua->get('http://localhost:8080' => 
+        {Accept => '*/*'} => json => {classify => $file})->result;
+    $self->log->debug(sprintf('stuff: %s', Dumper($res->json)));
+    #my $input = $self->get_full_name($file);
+    #my $class;
+    #$class = $self->trans_ident->classify( input => $input );
     #$self->log->error(sprintf($err));
+    my $class =  $res->json->{classification};
     return $class;
 }
 
