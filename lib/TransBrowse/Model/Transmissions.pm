@@ -4,12 +4,8 @@ use Mojo::Base -base;
 use warnings;
 use strict;
 
-use Mojo::JSON qw(decode_json);
-
 use File::Find::Rule;
 use Math::Round;
-
-use TransmissionIdentifier;
 
 use File::Path 'make_path';
 
@@ -22,10 +18,6 @@ has postgres => sub { Carp::croak 'db is required' };
 has log      => sub { Carp::croak 'log is required' };
 has config   => sub { Carp::croak 'config is required' };
 has ua       => sub { my $ua  = Mojo::UserAgent->new };
-#has trans_ident => sub { TransmissionIdentifier->new( { load_params => 1,
-#                                                        params => '/cart/xmit_mxnet/xmit.params',
-#                                                        labels => '/cart/xmit_mxnet/labels.txt' }
-#                                                     ) };
 
 sub get_xmits {
     my $self = shift;
@@ -92,11 +84,6 @@ sub create_training_data {
     }
 
     # create directory structure for training data
-    #if (-e $base_dir) {
-	#$err = sprintf('Could not create base dir (%s) for training data: %s (no training data has been created)', $base_dir, $!);
-       # $self->log->error(sprintf($err));
-#	return $err;
- #   }
     my $classes = $trans->uniq( sub { $_->{class} } );
 
     foreach my $rec (@{$classes}) {
@@ -144,12 +131,9 @@ sub classify {
 
     my $res = $self->ua->get('http://localhost:8080' => 
         {Accept => '*/*'} => json => {classify => $file})->result;
-    $self->log->debug(sprintf('stuff: %s', Dumper($res->json)));
-    #my $input = $self->get_full_name($file);
-    #my $class;
-    #$class = $self->trans_ident->classify( input => $input );
-    #$self->log->error(sprintf($err));
+
     my $class =  $res->json->{classification};
+
     return $class;
 }
 
